@@ -1,67 +1,11 @@
-# Description
-Official code for the paper "HILCodec: High Fidelity and Lightweight Neural Audio Codec".  
-\[[paper](https://arxiv.org/abs/2405.04752)\] \[[samples](https://aask1357.github.io/hilcodec/)\]
+# HILCodec: High-Fidelity and Lightweight Neural Audio Codec
 
-# Environment
-We tested under:
-- CUDA=10.2, torch=1.12
-- CUDA=11.7, torch=1.13
-- CUDA=11.8, torch=2.5
+A mirror for the original [HILCodec repository](https://github.com/aask1357/hilcodec) that adds a `setup.py` script to make installation easy.
 
-It may work in other environments, but not guaranteed.
+---------------------------------------------------------------------------------------------------------
 
-# Install using anaconda
-## Intall for training
-First, install [PyTorch](https://pytorch.org/get-started/locally/) along with torchaudio.  
-Then, install other requirements as below.
-<pre><code>conda install librosa -c conda-forge
-conda install jupyter notebook matplotlib scipy tensorboard tqdm pyyaml
-pip install pesq pystoi</code></pre>
-Finally, install [ONNXRuntime for CPU ](https://onnxruntime.ai/docs/install/).  
-Optionally, install [ViSQOL](https://github.com/google/visqol).  
-## Install for test
-For test, you only need to install ONNXRuntime, librosa, and soundfile.  
+## 📧 Contact
 
-# Datasets
-Download VCTK, DNS-Challenge4 and Jamendo dataset for training.
-For validation, we used `p225`, `p226`, `p227`, and `p228` from VCTK for clean speech. Real noisy speech recordings from DNS-Challenge4 are used for noisy speech. `Jamendo/99` are used for music.  
-Downsample all audio files into 24khz before training (see `scripts/Resampling.ipynb`).  
+[luca.dellalib@gmail.com](mailto:luca.dellalib@gmail.com)
 
-# Training
-1. `configs/...yaml` files contain various configurations. Among those configurations, you must modify `directories_to_include`, `directories_to_exclude`, `wav_dir`. `configs/hilcodec_music.yaml` file includes explanations for each arguments. If you don't understand any argument, feel free to leave an issue.
-2. Modify `filelists/infer_24khz.txt` or `filelists/infer_speech.txt` file, which cotain relative paths for audio files used for inference. Note that you can set the base directory using `data.wav_dir` argument in configuration files.
-3. Either use `train.py` or `train_torchrun.py` for training. Examples are:
-<pre><code>CUDA_VISIBLE_DEVICES=0,1 python train.py -c configs/hilcodec_music.yaml -n first_exp -p train.batch_size=16 train.seed=1234 -f</code></pre>
-<pre><code>CUDA_VISIBLE_DEVICES=0,1 torchrun --standalone --nproc_per_node=2 train_torchrun.py -c configs/hilcodec_music.yaml -n first_exp -p train.batch_size=16 train.seed=1234 -f</code></pre>  
-Arguments:  
--n: (Required) Directory name to save checkpoints, the configuration file, and tensorboard logs.  
--c: (Optional) Configuration file path. If not given, use a configuration file in the directory.  
--p: (Optional) Parameters after this will update configurations.  
--f: (Optional) If the directory already exists, an exception will be raised to avoid overwriting config file. However, enabling this option will force overwriting config file.
-
-# Inference
-## ONNX
-Pre-trained model parameters are provided in the `onnx` directory. Two versions are available: 
-- hil_music  
-- hil_speech  
-
-`hil_music` is a model trained on general audio dataset (clean speech, noisy speech, music).
-`hil_speech` is a model trained only on clean speech dataset.  
-
-Modify the variable `PATH` in `test_onnx.py` as you want, and run the following code:
-<pre><code>python test_onnx.py -n hil_speech --enc --dec</code></pre>  
-The output will be saved at `onnx/hil_speech_output.wav`.  
-Use `python test_onnx.py --help` for information about each argument.  
-Note that for AudioDec, you must set `-H 300`.  
-
-You can convert your own trained HILCodec to ONNXRuntime using `scripts/HILCodec Onnx.ipynb`.  
-You can also convert [Encodec](https://github.com/facebookresearch/encodec) and [AudioDec](https://github.com/facebookresearch/AudioDec) to ONNXRuntime for comparison.  
-Download checkpoints from official repositories and use `scripts/Encodec Onnx.ipynb` or `scripts/AudioDec Onnx.ipynb`.
-## PyTorch
-You can also download pytorch checkpoints and tensorboard logs from [google drive](https://drive.google.com/drive/folders/1og7uw_t1oJd7qcg-sjjuJ4Pn7t1TArsW?usp=drive_link).  
-Download the .zip files and use `scripts/inference.ipynb`.
-
-# Evaluating PESQ, STOI and ViSQOL
-Our training code includes objective metrics calculation. You can set `pesq` in a config file appropriately.  
-Note that on our server it occasionally crashes (especially when calculating ViSQOL), so the default config is to turn off calculation.  
-To calculate metrics after training, you can use `scripts/pesq.ipynb`.  
+---------------------------------------------------------------------------------------------------------

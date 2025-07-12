@@ -1,20 +1,4 @@
-numpy
-pytorch
-torchaudio
-librosa
-unidecode
 einops
-cython
-tensorboard
-jupyter
-notebook
-matplotlib
-tqdm
-pyyaml
-pesq
-pystoi
-scipy >= 0.16.0
-
-# Optional
-praat-parselmouth   # used for extracting pitch
-g2p_en              # used for english tts
+numpy
+torch
+torchaudio
