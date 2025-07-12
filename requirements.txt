@@ -2,6 +2,6 @@ einops
 gdown
 huggingface-hub
 numpy
+pyyaml
 torch
 torchaudio
-yaml
