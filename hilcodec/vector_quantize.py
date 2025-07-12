@@ -205,6 +205,15 @@ class ResidualVQ(nn.Module):
         )
         self.channel_last = channel_last
 
+    def decode(self, q_indices: torch.Tensor) -> torch.Tensor:
+        quantized_out = torch.tensor(0.0, device=q_indices.device)
+        q_indices = q_indices.movedim(0, 1)
+        for i, indices in enumerate(q_indices):
+            layer = self.layers[i]
+            quantized = layer.embed[indices]
+            quantized_out = quantized_out + quantized
+        return quantized_out.movedim(-1, -2)
+
     def forward(
         self,
         x: Tensor,
