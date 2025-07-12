@@ -226,5 +226,11 @@ class HILCodec(nn.Module):
 
 
 if __name__ == "__main__":
-    codec = HILCodec.from_pretrained("hilcodec_music")
+    codec = HILCodec.from_pretrained("hilcodec_speech")
+    x = torch.randn(2, 1, 24000)
+
+    x = codec.encoder(x)
+    x, _, _, indices = codec.quantizer(x, n=8)
+    x = codec.decoder(x)
+
     print(codec)

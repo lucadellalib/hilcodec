@@ -209,7 +209,7 @@ class ResidualVQ(nn.Module):
         self,
         x: Tensor,
         n: tp.Optional[int] = None,
-        return_indices: bool = False,
+        return_indices: bool = True,
     ) -> tp.Tuple[Tensor, np.ndarray, Tensor, Tensor]:
         if not self.channel_last:
             residual = x.transpose(1, 2).detach()  # [B, C, T] -> [B, T, C]
