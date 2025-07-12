@@ -166,3 +166,65 @@ class HILCodec(nn.Module):
             for module in self.modules():
                 if isinstance(module, NormConv1d):
                     module.conv = remove_weight_norm(module.conv)
+
+    @classmethod
+    def from_pretrained(cls, model_name):
+        import os
+        import gdown
+        import yaml
+        from huggingface_hub.constants import HUGGINGFACE_HUB_CACHE
+
+        model_info = {
+            "hilcodec_speech": {
+                "repo_id": "hilcodec/hilcodec-speech",
+                "files": {
+                    "config.yaml": "1ntnV6fQ8U-VYc_DYDhTengQJHZAEYEU2",
+                    "00150.pth": "16-G1LaPsEclIvqUmaqQo6VTid65y5_tF",
+                },
+            },
+            "hilcodec_music": {
+                "repo_id": "hilcodec/hilcodec-music",
+                "files": {
+                    "config.yaml": "17Vhy3M32Azl9M0CjrBPIQKsmkVHILf5g",
+                    "00150.pth": "1fQpuIab8HYWulWaC-GJ7VK21862m-sri",
+                },
+            },
+        }
+
+        if model_name not in model_info:
+            raise NotImplementedError(f"Unknown model name: {model_name}")
+
+        repo_id = model_info[model_name]["repo_id"]
+        files = model_info[model_name]["files"]
+
+        # Resolve Hugging Face cache directory
+        cache_dir = os.path.join(HUGGINGFACE_HUB_CACHE, repo_id.replace("/", "--"))
+        os.makedirs(cache_dir, exist_ok=True)
+
+        # Download files if not already cached
+        for filename, file_id in files.items():
+            path = os.path.join(cache_dir, filename)
+            if not os.path.exists(path):
+                print(f"Downloading {filename} to cache...")
+                gdown.download(f"https://drive.google.com/uc?id={file_id}", path, quiet=False)
+            else:
+                print(f"Using cached file: {path}")
+
+        # Load config
+        config_path = os.path.join(cache_dir, "config.yaml")
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = yaml.safe_load(f)
+
+        # Instantiate model
+        model = cls(
+            sample_rate=config["data"]["sampling_rate"],
+            channels_audio=config["data"]["channels"],
+            **config["model_kwargs"]
+        )
+        model.remove_weight_reparameterizations()
+        return model
+
+
+if __name__ == "__main__":
+    codec = HILCodec.from_pretrained("hilcodec_music")
+    print(codec)

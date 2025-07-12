@@ -1,4 +1,7 @@
 einops
+gdown
+huggingface-hub
 numpy
 torch
 torchaudio
+yaml
