@@ -205,10 +205,10 @@ class HILCodec(nn.Module):
         for filename, file_id in files.items():
             path = os.path.join(cache_dir, filename)
             if not os.path.exists(path):
-                print(f"Downloading {filename} to cache...")
+                #print(f"Downloading {filename} to cache...")
                 gdown.download(f"https://drive.google.com/uc?id={file_id}", path, quiet=False)
-            else:
-                print(f"Using cached file: {path}")
+            #else:
+            #    print(f"Using cached file: {path}")
 
         # Load config
         config_path = os.path.join(cache_dir, "config.yaml")
@@ -221,12 +221,17 @@ class HILCodec(nn.Module):
             channels_audio=config["data"]["channels"],
             **config["model_kwargs"]
         )
+
+        checkpoint_path = os.path.join(cache_dir, "00150.pth")
+        state_dict = torch.load(checkpoint_path, map_location="cpu")["model"]
+        model.load_state_dict(state_dict)
+
         model.remove_weight_reparameterizations()
-        return model
+        return model.eval()
 
 
 if __name__ == "__main__":
-    codec = HILCodec.from_pretrained("hilcodec_speech")
+    codec = HILCodec.from_pretrained("hilcodec_speech").eval()
     x = torch.randn(2, 1, 24000)
     x = codec.encoder(x)
     x, _, _, indices = codec.quantizer(x, n=8)
