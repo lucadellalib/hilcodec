@@ -85,7 +85,7 @@ class EuclideanCodebook(nn.Module):
         self.ema_num_threshold = ema_num_threshold
         self.ema_num_initial = ema_num_initial
 
-        self.initted = not kmeans_init
+        self.initted = True
         self.register_buffer("embed", embed)
         self.register_buffer("ema_embed", embed.clone() * ema_num_initial)
         self.register_buffer("ema_num", torch.ones(codebook_size) * ema_num_initial)
