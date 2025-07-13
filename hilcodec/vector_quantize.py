@@ -92,14 +92,9 @@ class EuclideanCodebook(nn.Module):
         self.embed: Tensor
         self.ema_num: Tensor
         self.ema_embed: Tensor
+        self.initted = False
 
         self.distributed = dist.is_initialized() and (dist.get_world_size() > 1)
-
-    def get_extra_state(self) -> tp.Dict[str, bool]:
-        return {"initted": self.initted}
-
-    def set_extra_state(self, state: tp.Dict[str, tp.Any]) -> None:
-        self.initted = state["initted"]
 
     def init_embed_(self, data: Tensor) -> None:
         embed, cluster_size = kmeans(data, self.codebook_size, self.kmeans_iters)
