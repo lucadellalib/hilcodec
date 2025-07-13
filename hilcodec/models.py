@@ -224,6 +224,9 @@ class HILCodec(nn.Module):
 
         checkpoint_path = os.path.join(cache_dir, "00150.pth")
         state_dict = torch.load(checkpoint_path, map_location="cpu")["model"]
+        for k in list(state_dict.keys()):
+            if "_extra_state" in k:
+                del state_dict[k]
         model.load_state_dict(state_dict)
 
         model.remove_weight_reparameterizations()
